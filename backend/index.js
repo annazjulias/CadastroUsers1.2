@@ -73,10 +73,11 @@ app.delete('/usuarios/:id', async (req, res) => {
       .json({ message: 'Usuário não encontrado', error: err.message });
   }
 });
-app.use(cors({
-  origin: 'https://cadastro-users1-2-1d4z.vercel.app'
-}));
-
+app.use(
+  cors({
+    origin: 'https://cadastro-users1-2-1d4z.vercel.app',
+  })
+);
 
 // GET verificar e-mail
 app.get('/usuarios/email/:email', async (req, res) => {
@@ -97,3 +98,4 @@ app.get('/usuarios/email/:email', async (req, res) => {
 });
 
 app.listen(3001, () => console.log('Backend rodando em http://localhost:3001'));
+app.get('/favicon.ico', (req, res) => res.status(204).end());
