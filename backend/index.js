@@ -19,6 +19,10 @@ const prisma = new PrismaClient();
 
 // ===== ROTAS =====
 
+app.get('/', (req, res) => {
+  return res.json('helo word');
+});
+
 // GET todos os usuários
 app.get('/usuarios', async (req, res) => {
   try {
