@@ -1,3 +1,4 @@
+import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -6,13 +7,13 @@ import { PrismaClient } from '@prisma/client';
 
 const app = express();
 
-import cors from 'cors';
 app.use(
   cors({
     origin: 'http://localhost:5175', // URL do seu frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
 );
+app.use(express.json());
 
 const prisma = new PrismaClient();
 
