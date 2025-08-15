@@ -5,7 +5,7 @@
   },
   "scripts": {
     "prebuild": "prisma generate",
-    "build": "echo 'Building backend...'", 
+    "build": "prisma generate && echo 'Building backend...'",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
