@@ -3,18 +3,16 @@ dotenv.config();
 
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import cors from 'cors';
 
 const app = express();
 
-// Configuração do CORS
+import cors from 'cors';
 app.use(
   cors({
-    origin: 'https://cadastro-users1-2-1d4z.vercel.app',
+    origin: 'http://localhost:5175', // URL do seu frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
 );
-
-app.use(express.json());
 
 const prisma = new PrismaClient();
 
@@ -109,5 +107,5 @@ app.get('/usuarios/email/:email', async (req, res) => {
 });
 
 // Servidor
-app.listen(3001, () => console.log('Backend rodando em http://localhost:3001'));
+app.listen(9000, () => console.log('Backend rodando em http://localhost:9000'));
 app.get('/favicon.ico', (req, res) => res.status(204).end());
