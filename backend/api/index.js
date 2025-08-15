@@ -1,10 +1,13 @@
+import mongoose from 'mongoose';
 import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 
 dotenv.config();
+const mongoUrl = process.env.DATABASE_URL;
 
+mongoose.connect(mongoUrl);
 const app = express();
 const prisma = new PrismaClient();
 
@@ -12,7 +15,7 @@ app.use(
   cors({
     origin: [
       'http://localhost:5173',
-      'https://cadastro-users1-2-1d4z.vercel.app/',
+      'https://cadastro-users1-2-1d4z.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
