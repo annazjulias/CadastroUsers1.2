@@ -1,0 +1,7 @@
+echo "node_modules
+.env
+backend/.env
+frontend/.env
+dist
+build
+.vercel" 
