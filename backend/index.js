@@ -73,6 +73,10 @@ app.delete('/usuarios/:id', async (req, res) => {
       .json({ message: 'Usuário não encontrado', error: err.message });
   }
 });
+app.use(cors({
+  origin: 'https://cadastro-users1-2-1d4z.vercel.app'
+}));
+
 
 // GET verificar e-mail
 app.get('/usuarios/email/:email', async (req, res) => {
