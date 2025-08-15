@@ -1,15 +1,24 @@
 import dotenv from 'dotenv';
-dotenv.config(); // carregar variáveis de ambiente antes de instanciar o Prisma
+dotenv.config();
 
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 
 const app = express();
-app.use(cors());
+
+// Configuração do CORS
+app.use(
+  cors({
+    origin: 'https://cadastro-users1-2-1d4z.vercel.app',
+  })
+);
+
 app.use(express.json());
 
 const prisma = new PrismaClient();
+
+// ===== ROTAS =====
 
 // GET todos os usuários
 app.get('/usuarios', async (req, res) => {
@@ -17,6 +26,7 @@ app.get('/usuarios', async (req, res) => {
     const users = await prisma.user.findMany();
     res.status(200).json(users);
   } catch (err) {
+    console.error(err);
     res
       .status(500)
       .json({ message: 'Erro ao buscar usuários', error: err.message });
@@ -34,6 +44,7 @@ app.post('/usuarios', async (req, res) => {
 
     res.status(201).json(user);
   } catch (err) {
+    console.error(err);
     res
       .status(400)
       .json({ message: 'Erro ao criar usuário', error: err.message });
@@ -53,6 +64,7 @@ app.put('/usuarios/:id', async (req, res) => {
 
     res.status(200).json(user);
   } catch (err) {
+    console.error(err);
     res
       .status(404)
       .json({ message: 'Usuário não encontrado', error: err.message });
@@ -68,34 +80,34 @@ app.delete('/usuarios/:id', async (req, res) => {
 
     res.status(200).json({ message: 'Usuário deletado', user });
   } catch (err) {
+    console.error(err);
     res
       .status(404)
       .json({ message: 'Usuário não encontrado', error: err.message });
   }
 });
-app.use(
-  cors({
-    origin: 'https://cadastro-users1-2-1d4z.vercel.app',
-  })
-);
 
 // GET verificar e-mail
 app.get('/usuarios/email/:email', async (req, res) => {
   try {
     const email = req.params.email.toLowerCase();
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!user)
       return res.status(404).json({ message: 'E-mail não encontrado' });
 
     res.status(200).json(user);
   } catch (err) {
+    console.error(err);
     res
       .status(500)
       .json({ message: 'Erro ao buscar usuário', error: err.message });
   }
 });
 
+// Servidor
 app.listen(3001, () => console.log('Backend rodando em http://localhost:3001'));
 app.get('/favicon.ico', (req, res) => res.status(204).end());
