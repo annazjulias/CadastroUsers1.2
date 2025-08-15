@@ -1,16 +1,15 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import { PrismaClient } from '@prisma/client';
 
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 
 const app = express();
 
-// Configuração do CORS
 app.use(
   cors({
-    origin: 'https://cadastro-users1-2-1d4z.vercel.app',
+    origin: ['http://localhost:5175'], // frontend local
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true, // se não usar cookies, pode remover
   })
 );
 
@@ -18,96 +17,66 @@ app.use(express.json());
 
 const prisma = new PrismaClient();
 
-// ===== ROTAS =====
-
 // GET todos os usuários
 app.get('/usuarios', async (req, res) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.status(200).json(users);
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .json({ message: 'Erro ao buscar usuários', error: err.message });
-  }
+  const users = await prisma.user.findMany();
+  res.status(200).json(users);
 });
 
 // POST novo usuário
 app.post('/usuarios', async (req, res) => {
-  try {
-    const { name, email, age, avatar } = req.body;
-
-    const user = await prisma.user.create({
-      data: { name, email, age, avatar },
-    });
-
-    res.status(201).json(user);
-  } catch (err) {
-    console.error(err);
-    res
-      .status(400)
-      .json({ message: 'Erro ao criar usuário', error: err.message });
-  }
+  const user = await prisma.user.create({
+    data: {
+      email: req.body.email,
+      age: req.body.age,
+      name: req.body.name,
+      avatar: req.body.avatar,
+    },
+  });
+  res.status(201).json(user);
 });
 
 // PUT atualizar usuário
 app.put('/usuarios/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, email, age, avatar } = req.body;
-
-    const user = await prisma.user.update({
-      where: { id },
-      data: { name, email, age, avatar },
-    });
-
-    res.status(200).json(user);
-  } catch (err) {
-    console.error(err);
-    res
-      .status(404)
-      .json({ message: 'Usuário não encontrado', error: err.message });
-  }
+  const user = await prisma.user.update({
+    where: {
+      id: req.params.id,
+    },
+    data: {
+      email: req.body.email,
+      age: req.body.age,
+      name: req.body.name,
+    },
+  });
+  res.status(200).json(user);
 });
 
 // DELETE usuário
 app.delete('/usuarios/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const user = await prisma.user.delete({ where: { id } });
-
-    res.status(200).json({ message: 'Usuário deletado', user });
-  } catch (err) {
-    console.error(err);
-    res
-      .status(404)
-      .json({ message: 'Usuário não encontrado', error: err.message });
-  }
+  const user = await prisma.user.delete({
+    where: {
+      id: req.params.id,
+    },
+  });
+  res.status(200).json({ message: 'Usuário deletado', user });
 });
 
 // GET verificar e-mail
 app.get('/usuarios/email/:email', async (req, res) => {
-  try {
-    const email = req.params.email.toLowerCase();
+  const email = req.params.email.toLowerCase();
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
 
-    if (!user)
-      return res.status(404).json({ message: 'E-mail não encontrado' });
-
-    res.status(200).json(user);
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .json({ message: 'Erro ao buscar usuário', error: err.message });
+  if (!user) {
+    return res.status(404).json({ message: 'E-mail não encontrado' });
   }
+
+  return res.status(200).json(user);
 });
 
-// Servidor
-app.listen(3001, () => console.log('Backend rodando em http://localhost:3001'));
-app.get('/favicon.ico', (req, res) => res.status(204).end());
+const PORT = process.env.PORT || 9000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
