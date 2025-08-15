@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
 app.use(
   cors({
     origin: [
-      'http://localhost:5175',
+      'http://localhost:5173',
       'https://cadastro-users1-2-1d4z.vercel.app/',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
