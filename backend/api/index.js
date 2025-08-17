@@ -4,9 +4,12 @@ import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
 const prisma = new PrismaClient();
 const app = express();
 
+// ===== MIDDLEWARES =====
+app.use(express.json());
 app.use(
   cors({
     origin: [
@@ -16,40 +19,44 @@ app.use(
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
 );
-app.use(express.json());
 
 // ===== ROTAS =====
 
-app.get('/', (req, res) => {
-  return res.json('helo word');
-});
+// Rota raiz
+app.get('/', (req, res) => res.json({ message: 'Hello World' }));
 
 // GET todos os usuários
 app.get('/usuarios', async (req, res) => {
   try {
     const users = await prisma.user.findMany();
-    res.status(200).json(users);
+    return res.status(200).json(users);
   } catch (err) {
-    console.error(err);
-    res
+    console.error('Erro ao buscar usuários:', err);
+    return res
       .status(500)
       .json({ message: 'Erro ao buscar usuários', error: err.message });
   }
 });
 
-// POST novo usuário
+// POST criar novo usuário
 app.post('/usuarios', async (req, res) => {
   try {
     const { name, email, age, avatar } = req.body;
+
+    if (!name || !email) {
+      return res
+        .status(400)
+        .json({ message: 'Nome e email são obrigatórios.' });
+    }
 
     const user = await prisma.user.create({
       data: { name, email, age, avatar },
     });
 
-    res.status(201).json(user);
+    return res.status(201).json(user);
   } catch (err) {
-    console.error(err);
-    res
+    console.error('Erro ao criar usuário:', err);
+    return res
       .status(400)
       .json({ message: 'Erro ao criar usuário', error: err.message });
   }
@@ -66,10 +73,10 @@ app.put('/usuarios/:id', async (req, res) => {
       data: { name, email, age, avatar },
     });
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (err) {
-    console.error(err);
-    res
+    console.error('Erro ao atualizar usuário:', err);
+    return res
       .status(404)
       .json({ message: 'Usuário não encontrado', error: err.message });
   }
@@ -82,10 +89,12 @@ app.delete('/usuarios/:id', async (req, res) => {
 
     const user = await prisma.user.delete({ where: { id } });
 
-    res.status(200).json({ message: 'Usuário deletado', user });
+    return res
+      .status(200)
+      .json({ message: 'Usuário deletado com sucesso', user });
   } catch (err) {
-    console.error(err);
-    res
+    console.error('Erro ao deletar usuário:', err);
+    return res
       .status(404)
       .json({ message: 'Usuário não encontrado', error: err.message });
   }
@@ -93,8 +102,11 @@ app.delete('/usuarios/:id', async (req, res) => {
 
 // favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end());
-const PORT = 9000;
+
+// ===== START SERVER =====
+const PORT = process.env.PORT || 9009;
 app.listen(PORT, () =>
   console.log(`Servidor rodando em http://localhost:${PORT}`)
 );
+
 export default app;
