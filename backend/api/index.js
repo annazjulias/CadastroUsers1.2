@@ -93,5 +93,8 @@ app.delete('/usuarios/:id', async (req, res) => {
 
 // favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end());
-
+const PORT = 9000;
+app.listen(PORT, () =>
+  console.log(`Servidor rodando em http://localhost:${PORT}`)
+);
 export default app;
